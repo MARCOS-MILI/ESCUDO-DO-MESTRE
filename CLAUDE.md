@@ -10,6 +10,10 @@ sem banco. Publicado pelo GitHub Pages a partir da `main`, pasta raiz.
 - Textos do site em português do Brasil natural: sem travessão, sem formalidade exagerada.
 - PROPOSTA ou SUGESTÃO no texto quer dizer ideia ainda não confirmada por ele.
 
+## Decidido pelo Marcos
+- 14/11/2026: o Escudo fica público e sem senha. Não propor senha de novo.
+- 14/11/2026: minigames ficam pra depois. Primeiro organizar o que já existe.
+
 ## Regras do repositório
 - Repositório público. Nunca escrever senha (quadro, fichas, terminal, Supabase) em arquivo nenhum.
 - Nunca mandar o endereço deste site pros jogadores. Imagens pros jogadores saem de `sessao-das-oito/pecas/`
