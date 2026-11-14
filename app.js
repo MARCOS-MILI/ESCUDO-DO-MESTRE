@@ -107,9 +107,14 @@
 
   /* ---------------------------------------------------------------- endereços */
   function slash(u) { u = String(u || '').trim(); return u && u.slice(-1) !== '/' ? u + '/' : u; }
-  function escudoBase() { return slash(store.get('cfg:escudo', window.CFG.escudo)); }
+  // Endereço deste site, tirado da própria barra do navegador (não depende de maiúscula ou minúscula).
+  function escudoBase() { return location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, ''); }
   function liveBase() { return slash(store.get('cfg:live', window.CFG.base)); }
-  function imgUrl(rel) { return escudoBase() + rel; }
+  // Imagens que vão pros jogadores saem do site dos jogadores (pasta pecas/), nunca deste site,
+  // pra o endereço do Escudo não aparecer em nenhum link que vai pra mesa.
+  function imgUrl(arq) { return liveBase() + 'pecas/' + arq; }
+  // Imagens só do mestre (cartões de NPC, mapa do mestre) continuam saindo daqui.
+  function ownUrl(rel) { return escudoBase() + rel; }
   function extractCode(s) {
     s = String(s || '').trim();
     var m = s.match(/[?&]j=([^&#\s]+)/);
@@ -531,7 +536,7 @@
       (n.onde ? '<div class="blk"><div class="lab">Onde achar</div><p>' + esc(n.onde) + '</p></div>' : '') +
       '<div><div class="lab" style="margin-bottom:6px">Suas anotações sobre ' + esc(n.nome.split(' ')[0]) + '</div>' +
       '<textarea class="field" data-in="npcnote" data-slug="' + n.slug + '" placeholder="O que os jogadores já descobriram, o que ele prometeu&hellip;" aria-label="Anotações">' + esc(store.get('npcnote:' + n.slug, '')) + '</textarea></div>' +
-      (n.img ? '<div class="row"><button class="btn" type="button" data-act="copy-url" data-rel="img/npc/' + n.slug + '.webp">Copiar link da imagem</button><span class="pill so">só mestre</span></div>' : '') +
+      (n.img ? '<div class="row"><button class="btn" type="button" data-act="copy-own" data-rel="img/npc/' + n.slug + '.webp">Copiar link da imagem</button><span class="pill so">só mestre</span></div>' : '') +
       '</div></div></div>';
     setLayer('m-npc', html);
   }
@@ -616,7 +621,9 @@
         '<img src="img/mapas/' + m[0] + '-t.webp" loading="lazy" alt="Mapa: ' + esc(m[1]) + '" style="margin-top:10px;border-radius:4px;border:1px solid var(--line);cursor:zoom-in;width:100%" data-act="zoom" data-src="img/mapas/' + m[0] + '.webp" data-title="Mapa: ' + esc(m[1]) + '">' +
         '<p class="small muted" style="margin:10px 0">' + m[3] + '</p>' +
         '<div class="row"><button class="btn sm" type="button" data-act="zoom" data-src="img/mapas/' + m[0] + '.webp" data-title="Mapa: ' + esc(m[1]) + '">Ver grande</button>' +
-        '<button class="btn sm" type="button" data-act="copy-url" data-rel="img/mapas/' + m[0] + '.webp">Copiar link</button></div></div>';
+        (m[2] === 'jogador'
+          ? '<button class="btn sm" type="button" data-act="copy-url" data-rel="mapa-' + m[0] + '.webp">Copiar link</button></div></div>'
+          : '<button class="btn sm" type="button" data-act="copy-own" data-rel="img/mapas/' + m[0] + '.webp">Copiar link (só mestre)</button></div></div>');
     }).join('');
     return '<h2>Mapas</h2><p class="lead">Três pranchas de Coxilha Seca. Toca na imagem pra ver grande e dar zoom.</p>' +
       '<div class="grid2">' + maps + '</div>' +
@@ -664,17 +671,16 @@
     var thumbs = pecas.map(function (p) {
       return '<div class="th"><img src="img/pecas/' + p[0] + '-t.webp" loading="lazy" alt="' + esc(p[1]) + '" data-act="zoom" data-src="img/pecas/' + p[0] + '.webp" data-title="' + esc(p[1]) + '">' +
         '<div class="nm">' + esc(p[1]) + '<br><span class="muted">' + esc(p[3]) + '</span></div>' +
-        '<button class="btn sm gold" type="button" data-act="copy-url" data-rel="img/pecas/' + p[0] + '.webp">Copiar link</button></div>';
+        '<button class="btn sm gold" type="button" data-act="copy-url" data-rel="' + p[0] + '.webp">Copiar link</button></div>';
     }).join('') + mapas.map(function (m) {
       return '<div class="th"><img src="img/mapas/' + m[0] + '-t.webp" loading="lazy" alt="' + esc(m[1]) + '" data-act="zoom" data-src="img/mapas/' + m[0] + '.webp" data-title="Mapa: ' + esc(m[1]) + '">' +
-        '<div class="nm">Mapa: ' + esc(m[1]) + '</div><button class="btn sm gold" type="button" data-act="copy-url" data-rel="img/mapas/' + m[0] + '.webp">Copiar link</button></div>';
+        '<div class="nm">Mapa: ' + esc(m[1]) + '</div><button class="btn sm gold" type="button" data-act="copy-url" data-rel="mapa-' + m[0] + '.webp">Copiar link</button></div>';
     }).join('');
     return '<h2>Links</h2><p class="lead">Tudo que você copia e manda pros jogadores, sem procurar. O que é segredo fica marcado.</p>' +
       '<div class="stack">' +
       '<div class="card"><h3>Endereços base</h3><div class="stack" style="gap:10px">' +
-      '<div><label class="lab" for="cfg-live">Site da sessão (quadro, ficha, terminal)</label><input class="field" id="cfg-live" data-in="cfg-live" value="' + esc(L) + '" autocapitalize="off" autocomplete="off" spellcheck="false"></div>' +
-      '<div><label class="lab" for="cfg-esc">Este site (de onde saem as imagens)</label><input class="field" id="cfg-esc" data-in="cfg-esc" value="' + esc(escudoBase()) + '" autocapitalize="off" autocomplete="off" spellcheck="false"></div>' +
-      '<p class="small muted" style="margin:0">Os links das imagens só funcionam depois que este site estiver publicado no GitHub Pages com o endereço acima.</p></div></div>' +
+      '<div><label class="lab" for="cfg-live">Site da sessão (quadro, ficha, terminal e imagens dos jogadores)</label><input class="field" id="cfg-live" data-in="cfg-live" value="' + esc(L) + '" autocapitalize="off" autocomplete="off" spellcheck="false"></div>' +
+      '<p class="small muted" style="margin:0">As imagens que vão pros jogadores ficam na pasta pecas/ desse site. Assim nenhum link que vai pra mesa mostra o endereço do Escudo.</p></div></div>' +
       '<div class="card"><h3>Códigos das fichas</h3><p class="small muted" style="margin-top:0">Cola aqui o link inteiro de cada jogador (ou só o código depois de j=). Fica salvo neste aparelho e entra nos links abaixo. Eu não consigo ler esses códigos.</p>' +
       '<div class="grid2"><div><label class="lab" for="code-abel">Abel</label><input class="field" id="code-abel" data-in="code" data-who="abel" value="' + esc(store.get('code:abel', '')) + '" placeholder="cole o link ou código" autocapitalize="off" autocomplete="off" spellcheck="false"></div>' +
       '<div><label class="lab" for="code-thomas">Thomas</label><input class="field" id="code-thomas" data-in="code" data-who="thomas" value="' + esc(store.get('code:thomas', '')) + '" placeholder="cole o link ou código" autocapitalize="off" autocomplete="off" spellcheck="false"></div></div></div>' +
@@ -686,7 +692,7 @@
       '<div class="thumbs">' + thumbs + '</div>' +
       '<div style="margin-top:12px"><button class="btn" type="button" data-act="copy-all">Copiar a lista de todos os links acima</button></div></div>' +
       '<div class="card"><h3>Senhas</h3><p class="small" style="margin:0">Eu não vejo nenhuma. Existem três: a do quadro (mestre), a das fichas e do terminal (mestre) e a do terminal dos jogadores. Como redefinir cada uma está na Cola dos enigmas (documento em Docs, no Claude).</p></div>' +
-      '<div class="card"><h3>Aviso do repositório</h3><p class="small" style="margin:0">O repositório é público. Quem achar o endereço enxerga tudo, inclusive os cartões dos NPCs e as respostas dos enigmas. Não mande o endereço deste site pros jogadores, só os links das imagens da lista acima.</p></div>' +
+      '<div class="card"><h3>Aviso do repositório</h3><p class="small" style="margin:0">O repositório é público. Quem achar o endereço enxerga tudo, inclusive os cartões dos NPCs e as respostas dos enigmas. Não mande o endereço deste site pros jogadores. Os links das imagens acima já saem do site dos jogadores, então podem ir sem medo.</p></div>' +
       '</div>';
   }
 
@@ -829,12 +835,13 @@
 
     'copy-text': function (b) { copy(b.dataset.txt); },
     'copy-url': function (b) { copy(imgUrl(b.dataset.rel), 'Link copiado'); },
+    'copy-own': function (b) { copy(ownUrl(b.dataset.rel), 'Link copiado (só mestre)'); },
     'copy-term': function (b) { copy(window.TERMINAL[Number(b.dataset.i)][2]); },
     'copy-msg': function (b) { copy(msgText(b.dataset.k), 'Mensagem copiada'); },
     'copy-all': function () {
       var linhas = [];
-      window.PECAS.filter(function (p) { return p[2] === 'jogador'; }).forEach(function (p) { linhas.push(p[1] + ': ' + imgUrl('img/pecas/' + p[0] + '.webp')); });
-      window.MAPAS.filter(function (m) { return m[2] === 'jogador'; }).forEach(function (m) { linhas.push('Mapa ' + m[1] + ': ' + imgUrl('img/mapas/' + m[0] + '.webp')); });
+      window.PECAS.filter(function (p) { return p[2] === 'jogador'; }).forEach(function (p) { linhas.push(p[1] + ': ' + imgUrl(p[0] + '.webp')); });
+      window.MAPAS.filter(function (m) { return m[2] === 'jogador'; }).forEach(function (m) { linhas.push('Mapa ' + m[1] + ': ' + imgUrl('mapa-' + m[0] + '.webp')); });
       copy(linhas.join('\n'), 'Lista copiada');
     },
 
@@ -902,7 +909,6 @@
     lugar: function (b) { $('#lugares').innerHTML = lugaresHtml(b.value); },
     notas: function (b) { store.set('notas', b.value); $('#notas-n').textContent = b.value.length + ' caracteres'; },
     'cfg-live': function (b) { store.set('cfg:live', b.value.trim()); refreshLinks(); },
-    'cfg-esc': function (b) { store.set('cfg:escudo', b.value.trim()); },
     code: function (b) { store.set('code:' + b.dataset.who, b.value.trim()); refreshLinks(); },
     quando: function (b) { store.set('quando', b.value); refreshMsgs(); }
   };
