@@ -1,7 +1,6 @@
 /* Conteúdo do Escudo do Mestre. Tudo que está como SUGESTÃO é proposta que o Marcos ainda não confirmou. */
 window.CFG = {
-  base: 'https://marcos-mili.github.io/sessao-das-oito/',
-  escudo: 'https://marcos-mili.github.io/escudo-do-mestre/'
+  base: 'https://marcos-mili.github.io/sessao-das-oito/'
 };
 
 window.GRUPOS = {
