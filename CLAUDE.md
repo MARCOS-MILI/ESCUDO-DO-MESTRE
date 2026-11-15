@@ -12,7 +12,7 @@ sem banco. Publicado pelo GitHub Pages a partir da `main`, pasta raiz.
 
 ## Decidido pelo Marcos
 - 14/11/2026: o Escudo fica público e sem senha. Não propor senha de novo.
-- 14/11/2026: minigames ficam pra depois. Primeiro organizar o que já existe.
+- 15/11/2026: minigames (rádio, Morse, projetor) ficam no site dos jogadores, em `sessao-das-oito/jogos/`. A aba Links tem os dois endereços.
 
 ## Regras do repositório
 - Repositório público. Nunca escrever senha (quadro, fichas, terminal, Supabase) em arquivo nenhum.

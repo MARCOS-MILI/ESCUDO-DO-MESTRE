@@ -665,7 +665,9 @@
       linkRow('Ficha do Abel', fichaUrl('abel'), ['pode', 'só pro Abel']) +
       linkRow('Ficha do Thomas', fichaUrl('thomas'), ['pode', 'só pro Thomas']) +
       linkRow('Fichas (visão do mestre)', L + 'ficha.html?mestre', ['so', 'só mestre']) +
-      linkRow('Terminal (visão do mestre)', L + 'terminal.html?mestre', ['so', 'só mestre']);
+      linkRow('Terminal (visão do mestre)', L + 'terminal.html?mestre', ['so', 'só mestre']) +
+        linkRow('Minigames (rádio, Morse e projetor)', L + 'jogos/', ['pode', 'pode mandar']) +
+        linkRow('Minigames (painel do mestre)', L + 'jogos/?mestre', ['so', 'só mestre']);
     var pecas = window.PECAS.filter(function (p) { return p[2] === 'jogador'; });
     var mapas = window.MAPAS.filter(function (m) { return m[2] === 'jogador'; });
     var thumbs = pecas.map(function (p) {
@@ -921,7 +923,9 @@
         linkRow('Ficha do Abel', fichaUrl('abel'), ['pode', 'só pro Abel']) +
         linkRow('Ficha do Thomas', fichaUrl('thomas'), ['pode', 'só pro Thomas']) +
         linkRow('Fichas (visão do mestre)', L + 'ficha.html?mestre', ['so', 'só mestre']) +
-        linkRow('Terminal (visão do mestre)', L + 'terminal.html?mestre', ['so', 'só mestre']);
+        linkRow('Terminal (visão do mestre)', L + 'terminal.html?mestre', ['so', 'só mestre']) +
+        linkRow('Minigames (rádio, Morse e projetor)', L + 'jogos/', ['pode', 'pode mandar']) +
+        linkRow('Minigames (painel do mestre)', L + 'jogos/?mestre', ['so', 'só mestre']);
     }
     refreshMsgs();
   }
